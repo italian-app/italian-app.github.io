@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Italian Practice maskable app icon">
+  <rect width="512" height="512" fill="#245c54"/>
+  <circle cx="256" cy="256" r="196" fill="#f6f7f4"/>
+  <path d="M150 152h72v208h-72z" fill="#25815f"/>
+  <path d="M290 152h72v208h-72z" fill="#c94f42"/>
+  <path d="M170 258h172v30H170zm0-58h172v30H170z" fill="#245c54"/>
+</svg>
