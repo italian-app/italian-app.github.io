@@ -23,6 +23,8 @@
   let currentQuestionNumber = 0;
   let hasInitializedSelection = false;
   let recentExercises: RecentExercise[] = loadRecentExercises();
+  let answerInput: HTMLInputElement | null = null;
+  let nextActionButton: HTMLButtonElement | null = null;
 
   $: totalQuestionsLabel = infiniteMode ? 'Infinite' : String(sessionLength);
   $: canStart = selectedGroupIds.length > 0 && !loadingGroups && !loadingExercise;
@@ -81,6 +83,7 @@
     try {
       exercise = await generateExercise(groupId);
       currentQuestionNumber = nextQuestionNumber;
+      focusAnswerInput();
     } catch (error) {
       appError = messageForError(error, 'Could not generate an exercise.');
       exercise = null;
@@ -103,6 +106,7 @@
         result: checkResult,
         checkedAt: new Date().toISOString()
       });
+      focusNextActionButton();
     } catch (error) {
       appError = messageForError(
         error,
@@ -111,6 +115,18 @@
     } finally {
       checkingAnswer = false;
     }
+  }
+
+  function focusAnswerInput() {
+    requestAnimationFrame(() => {
+      answerInput?.focus();
+    });
+  }
+
+  function focusNextActionButton() {
+    requestAnimationFrame(() => {
+      nextActionButton?.focus();
+    });
   }
 
   function stopSession() {
@@ -136,7 +152,7 @@
 <main class="app-shell">
   <section class="app-header" aria-labelledby="app-title">
     <p class="eyebrow">Italian grammar practice</p>
-    <h1 id="app-title">Practice one prompt at a time.</h1>
+    <h1 id="app-title">Precision practice for Italian on the go</h1>
   </section>
 
   {#if appError}
@@ -248,6 +264,7 @@
           <label for="answer">Answer</label>
           <input
             id="answer"
+            bind:this={answerInput}
             bind:value={answer}
             disabled={checkingAnswer || checkResult !== null}
             autocomplete="off"
@@ -269,10 +286,12 @@
           {#if isSessionComplete}
             <div class="completion">
               <p>Session complete.</p>
-              <button type="button" class="primary-button" on:click={stopSession}>Choose another session</button>
+              <button type="button" class="primary-button" bind:this={nextActionButton} on:click={stopSession}>
+                Choose another session
+              </button>
             </div>
           {:else}
-            <button type="button" class="primary-button" on:click={loadNextExercise}>Next</button>
+            <button type="button" class="primary-button" bind:this={nextActionButton} on:click={loadNextExercise}>Next</button>
           {/if}
         {/if}
       {/if}

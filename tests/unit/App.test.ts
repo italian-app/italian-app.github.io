@@ -126,6 +126,7 @@ describe('App', () => {
     expect(await screen.findByText('Io (inviare PRESENTE) un messaggio a te')).toBeInTheDocument();
     expect(screen.getByText('Question 1 / 30')).toBeInTheDocument();
     expect(screen.getByText('Write the complete Italian sentence.')).toBeInTheDocument();
+    await waitFor(() => expect(screen.getByLabelText('Answer')).toHaveFocus());
     expect(generatedGroupIds).toEqual(['pronome_diretto_presente']);
   });
 
@@ -142,6 +143,25 @@ describe('App', () => {
     expect(screen.getByText('Expected: Te lo invio')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Next' })).toBeInTheDocument();
     expect(checkedAnswers).toEqual([{ exercise_id: 'exercise-1', answer: 'Te lo invio' }]);
+  });
+
+  it('checks with Enter and advances with another Enter', async () => {
+    generateQueue = [firstExercise, secondExercise];
+
+    const user = userEvent.setup();
+    render(App);
+
+    await screen.findByLabelText(/Pronome Diretto PRESENTE/);
+    await user.click(screen.getByRole('button', { name: 'Start session' }));
+    await user.type(await screen.findByLabelText('Answer'), 'Te lo invio{Enter}');
+
+    expect(await screen.findByText('Correct')).toBeInTheDocument();
+    await waitFor(() => expect(screen.getByRole('button', { name: 'Next' })).toHaveFocus());
+    await user.keyboard('{Enter}');
+
+    expect(await screen.findByText('Vado ___ Roma')).toBeInTheDocument();
+    await waitFor(() => expect(screen.getByLabelText('Answer')).toHaveFocus());
+    expect(generatedGroupIds).toEqual(['pronome_diretto_presente', 'preposizione']);
   });
 
   it('shows incorrect feedback with expected answers and hint', async () => {
